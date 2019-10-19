@@ -5,7 +5,7 @@ Vertex vertices[] = {
 	glm::vec3(-0.5f, 0.5f, 0.f),		glm::vec3(1.f, 0.f, 0.f),	glm::vec2(0.f, 1.f),
 	glm::vec3(-0.5f, -0.5f, 0.f),		glm::vec3(0.f, 1.f, 0.f),	glm::vec2(0.f, 0.f),
 	glm::vec3(0.5f, -0.5f, 0.f),		glm::vec3(0.f, 0.f, 1.f),	glm::vec2(1.f, 0.f),
-	glm::vec3(0.5f, 0.5f, 0.f),			glm::vec3(0.f, 1.f, 0.f),	glm::vec2(0.f, 0.f),
+	glm::vec3(0.5f, 0.5f, 0.f),			glm::vec3(0.f, 1.f, 0.f),	glm::vec2(1.f, 1.f),
 	
 
 };
@@ -116,6 +116,68 @@ bool loadShaders(GLuint& program) {
 
 }
 
+void updateInput(GLFWwindow* window, glm::vec3& position, glm::vec3& rotation, glm::vec3& scale) {
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+		position.z += 0.01f;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+		position.z -= 0.01f;
+	}
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+		position.x -= 0.01f;
+	}
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+		position.x += 0.01f;
+	}
+	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
+		rotation.y -= 0.01f;
+	}
+	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
+		rotation.y += 0.01f;
+	}
+	if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS) {
+		scale += 0.1f;
+	}
+	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) {
+		scale -= 0.1f;
+	}
+}
+
+// Initialize a texture and return
+GLuint createTexture(std::string img_path)
+{
+	int image_width = 0;
+	int image_height = 0;
+	//unsigned char* image = SOIL_load_image("Images/pic1.png", &image_width, &image_height, NULL, SOIL_LOAD_RGBA);
+	unsigned char* image = SOIL_load_image(img_path.c_str(), &image_width, &image_height, NULL, SOIL_LOAD_RGBA);
+
+	GLuint texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+	if (image)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		std::cout << "ERROR::TEXTURE_LOADING_FAILED" << "\n";
+	}
+
+	glActiveTexture(0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	SOIL_free_image_data(image);
+
+	return texture;
+}
+
 int main() {
 	//init glfw
 	glfwInit();
@@ -132,9 +194,10 @@ int main() {
 	glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 
 	GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "opengl_practice", NULL, NULL);
-
+	
+	glfwGetFramebufferSize(window, &frameBufferWidth, &frameBufferHeight); //for aspect ratio
 	glfwSetFramebufferSizeCallback(window, framebuffer_resize_callback);
-	//glfwGetFramebufferSize(window, &frameBufferWidth, &frameBufferHeight);
+	
 	//glViewport(0, 0, frameBufferWidth, frameBufferHeight);
 	glfwMakeContextCurrent(window);
 
@@ -197,12 +260,59 @@ int main() {
 	//Unbind VAO
 	glBindVertexArray(0);
 
+	//TEXTURE UNIT
+	GLuint texture0 = createTexture("Images/pic1.png");
+	GLuint texture1 = createTexture("Images/pic2.png");
+
+	//Translate, rotate, and scale
+	glm::vec3 position(0.f);
+	glm::vec3 rotation(0.f);
+	glm::vec3 scale(1.f);
+
+	glm::mat4 modelMatrix(1.f);
+	modelMatrix = glm::translate(modelMatrix, position);
+	modelMatrix = glm::rotate(modelMatrix, rotation.x, glm::vec3(1.f, 0.f, 0.f));
+	modelMatrix = glm::rotate(modelMatrix, rotation.y, glm::vec3(0.f, 1.f, 0.f));
+	modelMatrix = glm::rotate(modelMatrix, rotation.z, glm::vec3(0.f, 0.f, 1.f));
+	modelMatrix = glm::scale(modelMatrix, scale);
+
+	//View Matrix
+	glm::vec3 camPosition(0.f, 0.f, 1.f);
+	glm::vec3 worldup(0.f, 1.f, 0.f);
+	glm::vec3 camFront(0.f, 0.f, -1.f);
+	glm::mat4 viewMatrix(1.f);
+	viewMatrix = glm::lookAt(camPosition, camPosition + camFront, worldup);
+
+	//Projection Matrix
+	float fov = 90.f;
+	float nearPlane = 0.1f;
+	float farPlane = 1000.f;
+	glm::mat4 projectionMatrix(1.f);
+
+	projectionMatrix = glm::perspective(
+		glm::radians(fov),
+		static_cast<float>(frameBufferWidth) / frameBufferHeight,
+		nearPlane,
+		farPlane
+	);
+
+
+
+	//Initialize the matrices
+	glUseProgram(core_program);
+	glUniformMatrix4fv(glGetUniformLocation(core_program, "modelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+	glUniformMatrix4fv(glGetUniformLocation(core_program, "viewMatrix"), 1, GL_FALSE, glm::value_ptr(viewMatrix));
+	glUniformMatrix4fv(glGetUniformLocation(core_program, "projectionMatrix"), 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+
+	glUseProgram(0);
+
 	//MAIN LOOP
 	while (!glfwWindowShouldClose(window)) {
 
 		//POLL for events
 		glfwPollEvents();
-		
+		updateInput(window, position, rotation, scale);
+
 		//update
 		updateWindow(window);
 
@@ -213,6 +323,39 @@ int main() {
 		//Use program
 		glUseProgram(core_program);
 
+		//Activate Texture
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texture0);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, texture1);
+
+		//Update uniforms
+		glUniform1i(glGetUniformLocation(core_program, "texture0"), 0);
+		glUniform1i(glGetUniformLocation(core_program, "texture1"), 1);
+
+		//Move, rotate, and scale
+		//position.z -= 0.005f;
+		//rotation.y += 0.05f;
+
+		modelMatrix = glm::mat4(1.f);
+		modelMatrix = glm::translate(modelMatrix, position);
+		modelMatrix = glm::rotate(modelMatrix, rotation.x, glm::vec3(1.f, 0.f, 0.f));
+		modelMatrix = glm::rotate(modelMatrix, rotation.y, glm::vec3(0.f, 1.f, 0.f));
+		modelMatrix = glm::rotate(modelMatrix, rotation.z, glm::vec3(0.f, 0.f, 1.f));
+		modelMatrix = glm::scale(modelMatrix, scale);
+		
+		glUniformMatrix4fv(glGetUniformLocation(core_program, "modelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+
+		glfwGetFramebufferSize(window, &frameBufferWidth, &frameBufferHeight);
+		projectionMatrix = glm::mat4(1.f);
+		projectionMatrix = glm::perspective(
+			glm::radians(fov),
+			static_cast<float>(frameBufferWidth) / frameBufferHeight,
+			nearPlane,
+			farPlane
+		);
+		glUniformMatrix4fv(glGetUniformLocation(core_program, "projectionMatrix"), 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+
 		//Bind vertex array object
 		glBindVertexArray(VAO);
 
@@ -222,6 +365,12 @@ int main() {
 		//End draw
 		glfwSwapBuffers(window);
 		glFlush();
+
+		glBindVertexArray(0);
+		glUseProgram(0);
+		glActiveTexture(0);
+		glBindTexture(GL_TEXTURE_2D, 0);
+
 	}
 	//END OF PROGRAM
 	glfwDestroyWindow(window);

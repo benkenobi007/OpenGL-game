@@ -1,11 +1,11 @@
 #include "libs.h"
 
 Vertex vertices[] = {
-	//POSITION							//COLOR						//TEXCOORD
-	glm::vec3(-0.5f, 0.5f, 0.f),		glm::vec3(1.f, 0.f, 0.f),	glm::vec2(0.f, 1.f),
-	glm::vec3(-0.5f, -0.5f, 0.f),		glm::vec3(0.f, 1.f, 0.f),	glm::vec2(0.f, 0.f),
-	glm::vec3(0.5f, -0.5f, 0.f),		glm::vec3(0.f, 0.f, 1.f),	glm::vec2(1.f, 0.f),
-	glm::vec3(0.5f, 0.5f, 0.f),			glm::vec3(0.f, 1.f, 0.f),	glm::vec2(1.f, 1.f),
+	//POSITION							//COLOR						//TEXCOORD				//NORMAL
+	glm::vec3(-0.5f, 0.5f, 0.f),		glm::vec3(1.f, 0.f, 0.f),	glm::vec2(0.f, 1.f),	glm::vec3(0.f, 0.f, 1.f),
+	glm::vec3(-0.5f, -0.5f, 0.f),		glm::vec3(0.f, 1.f, 0.f),	glm::vec2(0.f, 0.f),	glm::vec3(0.f, 0.f, 1.f),
+	glm::vec3(0.5f, -0.5f, 0.f),		glm::vec3(0.f, 0.f, 1.f),	glm::vec2(1.f, 0.f),	glm::vec3(0.f, 0.f, 1.f),
+	glm::vec3(0.5f, 0.5f, 0.f),			glm::vec3(0.f, 1.f, 0.f),	glm::vec2(1.f, 1.f),	glm::vec3(0.f, 0.f, 1.f),
 	
 
 };
@@ -256,7 +256,10 @@ int main() {
 	//Texcoord
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, texcoord));
 	glEnableVertexAttribArray(2);
-	
+	//Normal
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, normal));
+	glEnableVertexAttribArray(3);
+
 	//Unbind VAO
 	glBindVertexArray(0);
 
@@ -296,7 +299,8 @@ int main() {
 		farPlane
 	);
 
-
+	//LIGHTS
+	glm::vec3 lightPos0(0.f, 0.f, 1.f);
 
 	//Initialize the matrices
 	glUseProgram(core_program);
@@ -304,6 +308,8 @@ int main() {
 	glUniformMatrix4fv(glGetUniformLocation(core_program, "viewMatrix"), 1, GL_FALSE, glm::value_ptr(viewMatrix));
 	glUniformMatrix4fv(glGetUniformLocation(core_program, "projectionMatrix"), 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 
+	glUniform3fv(glGetUniformLocation(core_program, "lightPos0"), 1, glm::value_ptr(lightPos0));
+	glUniform3fv(glGetUniformLocation(core_program, "camPosition"), 1, glm::value_ptr(camPosition));
 	glUseProgram(0);
 
 	//MAIN LOOP

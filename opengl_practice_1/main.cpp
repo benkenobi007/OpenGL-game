@@ -30,7 +30,6 @@ void framebuffer_resize_callback(GLFWwindow* window, int fbw, int fbh) {
 
 bool loadShaders(GLuint& program) {
 	bool loadSuccess = true;
-
 	char infoLog[512];
 	GLint success;
 	

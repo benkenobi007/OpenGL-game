@@ -19,6 +19,8 @@
 #include<SOIL2.h>
 
 #include "shader.h"
+#include "Texture.h"
+#include"Material.h"
 
 struct Vertex
 {

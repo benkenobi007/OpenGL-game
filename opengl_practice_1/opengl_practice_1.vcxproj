@@ -139,7 +139,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="libs.h" />
+    <ClInclude Include="Material.h" />
     <ClInclude Include="shader.h" />
+    <ClInclude Include="Texture.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="fragment_core.glsl" />

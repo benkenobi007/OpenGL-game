@@ -191,7 +191,8 @@ int main() {
 	Shader core_program((char*)"vertex_core.glsl", (char*)"fragment_core.glsl");
 
 
-	//MODEL
+	//MODEL MESH
+	Mesh test(vertices, nrOfVertices, indices, nrOfIndices);
 
 	//VAO, VBO, EBO
 	//GEN VAO AND BIND
@@ -332,6 +333,8 @@ int main() {
 
 		//draw
 		glDrawElements(GL_TRIANGLES, nrOfIndices, GL_UNSIGNED_INT, 0);
+
+		test.render(&core_program);
 
 		//End draw
 		glfwSwapBuffers(window);

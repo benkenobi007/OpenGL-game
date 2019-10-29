@@ -24,6 +24,20 @@ private:
 	const int GL_VERSION_MAJOR;
 	const int GL_VERSION_MINOR;
 
+	//Delta Time
+	float dt;
+	float curTime;
+	float lastTime;
+
+	//Mouse Input
+	double lastMouseX;
+	double lastMouseY;
+	double mouseX;
+	double mouseY;
+	double mouseOffsetX;
+	double mouseOffsetY;
+	bool firstMouse;
+
 	//matrices
 	//view matrix
 	glm::mat4 viewMatrix;
@@ -85,12 +99,16 @@ public:
 	void setWindowShouldClose();
 
 	//Functions
+	void updateKeyboardInput();
+	void updateMouseInput();
+	void updateInput();
 	void update();
 	void render();
+	void updateDt();
 
 	//Static Functions
 	static void framebuffer_resize_callback(GLFWwindow* window, int fbw, int fbh);
-	static void updateInput(GLFWwindow* window);
-	static void updateInput(GLFWwindow* window, Mesh& mesh);
+	/*static void updateInput(GLFWwindow* window);
+	static void updateInput(GLFWwindow* window, Mesh& mesh);*/
 };
 

@@ -12,7 +12,7 @@ void framebuffer_resize_callback(GLFWwindow* window, int fbw, int fbh) {
 }
 */
 
-
+/*
 bool loadShaders(GLuint& program) {
 	bool loadSuccess = true;
 	char infoLog[512];
@@ -99,6 +99,7 @@ bool loadShaders(GLuint& program) {
 	return loadSuccess;
 
 }
+*/
 
 void updateInput(GLFWwindow* window, Mesh& mesh) {
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
@@ -160,8 +161,8 @@ int main() {
 	//create window
 	const int GLMajorVersion = 4;
 	const int GLMinorVersion = 6;
-	const int WINDOW_WIDTH = 640;
-	const int WINDOW_HEIGHT = 480;
+	const int WINDOW_WIDTH = 1080;
+	const int WINDOW_HEIGHT = 720;
 	int frameBufferWidth = 0;
 	int frameBufferHeight = 0;
 

@@ -4,7 +4,7 @@
 
 //ENUMS
 enum shader_enum {SHADER_CORE_PROGRAM = 0};
-enum texture_enum {TEX_PIC1 = 0, TEX_PIC2};
+enum texture_enum {TEX_PIC1 = 0, TEX_PIC1_SPECULAR, TEX_PIC2, TEX_PIC2_SPECULAR};
 enum material_enum {MAT_1 = 0};
 enum mesh_enum{MESH_QUAD=0};
 
@@ -64,6 +64,8 @@ private:
 	void initMeshes();
 	void initLights();
 	void initUniforms();
+	
+	void updateUniforms();
 
 	//Static Variables
 public:
@@ -88,5 +90,7 @@ public:
 
 	//Static Functions
 	static void framebuffer_resize_callback(GLFWwindow* window, int fbw, int fbh);
+	static void updateInput(GLFWwindow* window);
+	static void updateInput(GLFWwindow* window, Mesh& mesh);
 };
 

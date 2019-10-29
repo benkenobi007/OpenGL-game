@@ -93,29 +93,32 @@ void Game::initShaders()
 void Game::initTextures()
 {
 	//TEXTURE 0
-	this->textures.push_back(new Texture("Images/pic1.png", GL_TEXTURE_2D, 0));
+	this->textures.push_back(new Texture("Images/pic1.png", GL_TEXTURE_2D));
+	this->textures.push_back(new Texture("Images/pic1_specular.png", GL_TEXTURE_2D));
 
 	//TEXTURE 1
-	this->textures.push_back(new Texture("Images/pic2.png", GL_TEXTURE_2D, 1));
+	this->textures.push_back(new Texture("Images/pic2.png", GL_TEXTURE_2D));
+	this->textures.push_back(new Texture("Images/pic2_specular.png", GL_TEXTURE_2D));
 
 }
 
 void Game::initMaterials()
 {
 	this->materials.push_back(new Material(glm::vec3(0.1f), glm::vec3(1.f), glm::vec3(1.f),
-		this->textures[TEX_PIC1]->getTextureUnit(), this->textures[TEX_PIC2]->getTextureUnit()));
+		0,1));
 
 }
 
 void Game::initMeshes()
 {
 	this->meshes.push_back(
-		new Mesh(&Quad(),
+		new Mesh(&Pyramid(),
 			glm::vec3(0.f),
 			glm::vec3(0.f),
 			glm::vec3(1.f)
 		)
 	);
+
 }
 
 void Game::initLights()
@@ -130,6 +133,21 @@ void Game::initUniforms()
 
 	this->shaders[SHADER_CORE_PROGRAM]->setVec3f(*this->lights[0], "lightPos0");
 	this->shaders[SHADER_CORE_PROGRAM]->setVec3f(this->camPosition, "camPosition");
+}
+
+void Game::updateUniforms()
+{
+	//Update framebuffer size
+	glfwGetFramebufferSize(this->window, &this->frameBufferWidth, &this->frameBufferHeight);
+
+	this->projectionMatrix = glm::perspective(
+		glm::radians(fov),
+		static_cast<float>(this->frameBufferWidth) / this->frameBufferHeight,
+		this->nearPlane,
+		this->farPlane
+	);
+	this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(projectionMatrix, "projectionMatrix");
+
 }
 
 //CONSTRUCTOR
@@ -216,38 +234,28 @@ void Game::render()
 {
 
 	//update
+	this->update();
+	Game::updateInput(this->window, *this->meshes[MESH_QUAD]);
+	Game::updateInput(this->window);
 
 	//clear
 	glClearColor(0.f, 0.f, 0.f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-	//Update uniforms
-	this->shaders[SHADER_CORE_PROGRAM]->set1i(this->textures[TEX_PIC1]->getTextureUnit(), "texture0");
-	this->shaders[SHADER_CORE_PROGRAM]->set1i(this->textures[TEX_PIC2]->getTextureUnit(), "texture1");
-	this->materials[MAT_1]->sendToShader(*this->shaders[SHADER_CORE_PROGRAM]);
-
-	//Update framebuffer size
-	glfwGetFramebufferSize(this->window, &this->frameBufferWidth, &this->frameBufferHeight);
+	this->updateUniforms();
 	
-	this->projectionMatrix = glm::perspective(
-		glm::radians(fov),
-		static_cast<float>(this->frameBufferWidth) / this->frameBufferHeight,
-		this->nearPlane,
-		this->farPlane
-	);
-	this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(projectionMatrix, "projectionMatrix");
+	this->materials[MAT_1]->sendToShader(*this->shaders[SHADER_CORE_PROGRAM]);
 
 	//Use program
 	this->shaders[SHADER_CORE_PROGRAM]->use();
 
 	//Activate Texture
-	this->textures[TEX_PIC1]->bind();
-	this->textures[TEX_PIC2]->bind();
-
+	this->textures[TEX_PIC2]->bind(0);
+	this->textures[TEX_PIC2_SPECULAR]->bind(1);
 
 	//draw
 	this->meshes[MESH_QUAD]->render(this->shaders[SHADER_CORE_PROGRAM]);
-
+	
 	//End draw
 	glfwSwapBuffers(window);
 	glFlush();
@@ -263,4 +271,45 @@ void Game::render()
 void Game::framebuffer_resize_callback(GLFWwindow* window, int fbw, int fbh)
 {
 	glViewport(0, 0, fbw, fbh);
+}
+
+void Game::updateInput(GLFWwindow* window) {
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+		glfwSetWindowShouldClose(window, GLFW_TRUE);
+	}
+}
+
+void Game::updateInput(GLFWwindow* window, Mesh& mesh) {
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+		mesh.move(glm::vec3(0.f, 0.f, -0.001f));
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+		mesh.move(glm::vec3(0.f, 0.f, 0.001f));
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+		mesh.move(glm::vec3(-0.001f, 0.f, 0.f));
+	}
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+		mesh.move(glm::vec3(0.001f, 0.f, 0.f));
+	}
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+		mesh.move(glm::vec3(0.f, 0.001f, 0.f));
+	}
+	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+		mesh.move(glm::vec3(0.f, -0.001f, 0.f));
+	}
+	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
+		mesh.rotate(glm::vec3(0.f, -0.001f, 0.f));
+	}
+	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
+		mesh.rotate(glm::vec3(0.f, 0.001f, 0.f));
+	}
+	if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS) {
+		mesh.updateScale(glm::vec3(1.f));
+	}
+	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) {
+		mesh.updateScale(glm::vec3(-1.f));
+	}
 }

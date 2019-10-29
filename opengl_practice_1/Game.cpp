@@ -54,9 +54,9 @@ void Game::initOpenGLOptions()
 	//OpenGL Options
 	glEnable(GL_DEPTH_TEST);
 
-	glEnable(GL_CULL_FACE);
+	/*glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
-	glFrontFace(GL_CCW);
+	glFrontFace(GL_CCW);*/
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -134,7 +134,7 @@ void Game::initUniforms()
 	this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(this->projectionMatrix, "projectionMatrix");
 
 	this->shaders[SHADER_CORE_PROGRAM]->setVec3f(*this->lights[0], "lightPos0");
-	this->shaders[SHADER_CORE_PROGRAM]->setVec3f(this->camPosition, "camPosition");
+	
 }
 
 void Game::updateUniforms()
@@ -142,8 +142,11 @@ void Game::updateUniforms()
 	//Update framebuffer size
 	glfwGetFramebufferSize(this->window, &this->frameBufferWidth, &this->frameBufferHeight);
 
-	this->viewMatrix = glm::lookAt(this->camPosition, this->camPosition + this->camFront, this->worldup);
+	this->viewMatrix = this->camera.getViewMatrix();
+	
 	this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(this->viewMatrix, "viewMatrix");
+
+	this->shaders[SHADER_CORE_PROGRAM]->setVec3f(this->camera.getPosition(), "camPosition");
 
 	this->projectionMatrix = glm::perspective(
 		glm::radians(fov),
@@ -151,6 +154,7 @@ void Game::updateUniforms()
 		this->nearPlane,
 		this->farPlane
 	);
+	
 	this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(this->projectionMatrix, "projectionMatrix");
 
 }
@@ -161,12 +165,15 @@ Game::Game(
 	const int WINDOW_WIDTH, const int WINDOW_HEIGHT,
 	const int GL_VERSION_MAJOR, const int GL_VERSION_MINOR,
 	bool resizable
-) 
-	: WINDOW_WIDTH(WINDOW_WIDTH), 
+)
+	: WINDOW_WIDTH(WINDOW_WIDTH),
 	WINDOW_HEIGHT(WINDOW_HEIGHT),
-	GL_VERSION_MAJOR(GL_VERSION_MAJOR), 
-	GL_VERSION_MINOR(GL_VERSION_MINOR)
+	GL_VERSION_MAJOR(GL_VERSION_MAJOR),
+	GL_VERSION_MINOR(GL_VERSION_MINOR),
+	camera(glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 1.f, 0.f))
 {
+	//Camera cam();
+
 	//init variables
 	this->window = nullptr;
 	this->frameBufferWidth = this->WINDOW_WIDTH;
@@ -244,14 +251,15 @@ void Game::setWindowShouldClose()
 void Game::update()
 {
 	//Update Input
-	glfwPollEvents();
 	this->updateDt();
 	this->updateInput();
+	this->camera.updateInput(this->dt, -1, this->mouseOffsetX, this->mouseOffsetY);
+	//this->meshes[MESH_QUAD]->rotate(glm::vec3(0.001f, 0.f, 0.f));
 
-	if (this->mouseOffsetX != 0 || this->mouseOffsetY != 0)
+	/*if (this->mouseOffsetX != 0 || this->mouseOffsetY != 0)
 		std::cout << "DT : " << this->dt << "\n"
 		<< "Mouse OffsetX: " << this->mouseOffsetX << "\n"
-		<< "Mouse OffsetY: " << this->mouseOffsetY << "\n";
+		<< "Mouse OffsetY: " << this->mouseOffsetY << "\n";*/
 }
 
 void Game::render()
@@ -306,7 +314,7 @@ void Game::updateKeyboardInput()
 
 	//CAMERA
 	if (glfwGetKey(this->window, GLFW_KEY_W) == GLFW_PRESS) {
-		this->camPosition.z -= 0.01f;
+		this->camPosition.z -= 0.005f;
 	}
 	if (glfwGetKey(this->window, GLFW_KEY_S) == GLFW_PRESS) {
 		this->camPosition.z += 0.01f;
@@ -348,7 +356,7 @@ void Game::updateMouseInput()
 
 void Game::updateInput()
 {
-	//glfwPollEvents();
+	glfwPollEvents();
 	this->updateKeyboardInput();
 	this->updateMouseInput();
 

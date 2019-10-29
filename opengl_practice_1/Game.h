@@ -38,8 +38,10 @@ private:
 	double mouseOffsetY;
 	bool firstMouse;
 
+	//camera
+	Camera camera;
+
 	//matrices
-	//view matrix
 	glm::mat4 viewMatrix;
 	glm::vec3 camPosition;
 	glm::vec3 worldup;

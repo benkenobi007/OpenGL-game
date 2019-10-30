@@ -123,6 +123,18 @@ void Game::initMeshes()
 
 }
 
+void Game::initModels()
+{
+	this->models.push_back(new Model(
+		glm::vec3(0.f),
+		this->materials[0],
+		this->textures[TEX_PIC1],
+		this->textures[TEX_PIC2],
+		this->meshes
+	)
+	);
+}
+
 void Game::initLights()
 {
 	this->lights.push_back(new glm::vec3(0.f, 0.f, 1.f));
@@ -210,6 +222,7 @@ Game::Game(
 	this->initTextures();
 	this->initMaterials();
 	this->initMeshes();
+	this->initModels();
 	this->initLights();
 	this->initUniforms();
 
@@ -232,6 +245,9 @@ Game::~Game()
 
 	for (size_t i = 0; i < this->meshes.size(); i++)
 		delete this->meshes[i];
+
+	for (auto*& i : this->models)
+		delete i;
 
 	for (size_t i = 0; i < this->lights.size(); i++)
 		delete this->lights[i];
@@ -256,7 +272,7 @@ void Game::update()
 	this->updateDt();
 	this->updateInput();
 	this->camera.updateInput(this->dt, -1, this->mouseOffsetX, this->mouseOffsetY);
-	this->meshes[MESH_QUAD]->rotate(glm::vec3(0.001f, 0.f, 0.f));
+	//this->meshes[MESH_QUAD]->rotate(glm::vec3(0.001f, 0.f, 0.f));
 
 	/*if (this->mouseOffsetX != 0 || this->mouseOffsetY != 0)
 		std::cout << "DT : " << this->dt << "\n"
@@ -275,20 +291,12 @@ void Game::render()
 	glClearColor(0.f, 0.f, 0.f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
+	//Update uniforms
 	this->updateUniforms();
 	
-	this->materials[MAT_1]->sendToShader(*this->shaders[SHADER_CORE_PROGRAM]);
+	//update models
+	this->models[0]->render(this->shaders[SHADER_CORE_PROGRAM]);
 
-	//Use program
-	this->shaders[SHADER_CORE_PROGRAM]->use();
-
-	//Activate Texture
-	this->textures[TEX_PIC1]->bind(0);
-	this->textures[TEX_PIC1_SPECULAR]->bind(1);
-
-	//draw
-	this->meshes[MESH_QUAD]->render(this->shaders[SHADER_CORE_PROGRAM]);
-	
 	//End draw
 	glfwSwapBuffers(window);
 	glFlush();

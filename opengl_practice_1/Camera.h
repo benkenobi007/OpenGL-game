@@ -26,7 +26,7 @@ private:
 	glm::vec3 position;
 	glm::vec3 front;
 	glm::vec3 right;
-	glm::vec3 up;
+	glm::vec3 up; 
 
 	GLfloat pitch;
 	GLfloat yaw;
@@ -39,7 +39,6 @@ private:
 		this->front.z = sin(glm::radians(this->yaw)) * cos(glm::radians(this->pitch));
 
 		this->front = glm::normalize(this->front);
-
 		this->right = glm::normalize(glm::cross(this->front, this->worldUp));
 		this->up = glm::normalize(glm::cross(this->right, this->front));
 	}
@@ -50,7 +49,7 @@ public:
 		this->viewMatrix = glm::mat4(1.f);
 
 		this->movementSpeed = 3.f;
-		this->sensitivity = 5.f;
+		this->sensitivity = 10.f;
 
 		this->worldUp = worldUp;
 		this->position = position;
@@ -82,7 +81,7 @@ public:
 
 
 	//Functions
-	void updateKeyboardInput(const float& dt, const int direction)
+	void move(const float& dt, const int direction)
 	{
 		//Update position vector
 		switch (direction) 
@@ -121,7 +120,6 @@ public:
 
 	void updateInput(const float& dt, const int direction, const double& offsetX, const double& offsetY)
 	{
-		this->updateKeyboardInput(dt, direction);
 		this->updateMouseInput(dt, direction, offsetX, offsetY);
 	}
 };

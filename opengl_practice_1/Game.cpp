@@ -142,11 +142,13 @@ void Game::updateUniforms()
 	//Update framebuffer size
 	glfwGetFramebufferSize(this->window, &this->frameBufferWidth, &this->frameBufferHeight);
 
+	//this->viewMatrix = glm::lookAt(this->camPosition, this->camPosition + this->camFront, this->worldup);
 	this->viewMatrix = this->camera.getViewMatrix();
-	
+	this->camPosition = this->camera.getPosition();
+
 	this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(this->viewMatrix, "viewMatrix");
 
-	this->shaders[SHADER_CORE_PROGRAM]->setVec3f(this->camera.getPosition(), "camPosition");
+	this->shaders[SHADER_CORE_PROGRAM]->setVec3f(this->camPosition, "camPosition");
 
 	this->projectionMatrix = glm::perspective(
 		glm::radians(fov),
@@ -254,7 +256,7 @@ void Game::update()
 	this->updateDt();
 	this->updateInput();
 	this->camera.updateInput(this->dt, -1, this->mouseOffsetX, this->mouseOffsetY);
-	//this->meshes[MESH_QUAD]->rotate(glm::vec3(0.001f, 0.f, 0.f));
+	this->meshes[MESH_QUAD]->rotate(glm::vec3(0.001f, 0.f, 0.f));
 
 	/*if (this->mouseOffsetX != 0 || this->mouseOffsetY != 0)
 		std::cout << "DT : " << this->dt << "\n"
@@ -314,16 +316,20 @@ void Game::updateKeyboardInput()
 
 	//CAMERA
 	if (glfwGetKey(this->window, GLFW_KEY_W) == GLFW_PRESS) {
-		this->camPosition.z -= 0.005f;
+		//this->camPosition.z -= 0.005f;
+		this->camera.move(this->dt, FORWARD);
 	}
 	if (glfwGetKey(this->window, GLFW_KEY_S) == GLFW_PRESS) {
-		this->camPosition.z += 0.01f;
+		//this->camPosition.z += 0.01f;
+		this->camera.move(this->dt, BACKWARD);
 	}
 	if (glfwGetKey(this->window, GLFW_KEY_A) == GLFW_PRESS) {
-		this->camPosition.x -= 0.01f;
+		//this->camPosition.x -= 0.01f;
+		this->camera.move(this->dt, LEFT);
 	}
 	if (glfwGetKey(this->window, GLFW_KEY_D) == GLFW_PRESS) {
-		this->camPosition.x += 0.01f;
+		//this->camPosition.x += 0.01f;
+		this->camera.move(this->dt, RIGHT);
 	}
 	if (glfwGetKey(this->window, GLFW_KEY_UP) == GLFW_PRESS) {
 		this->camPosition.y += 0.01f;

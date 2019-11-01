@@ -4,7 +4,7 @@
 
 //ENUMS
 enum shader_enum {SHADER_CORE_PROGRAM = 0};
-enum texture_enum {TEX_PIC1 = 0, TEX_PIC1_SPECULAR, TEX_PIC2, TEX_PIC2_SPECULAR};
+enum texture_enum {TEX_PIC1 = 0, TEX_PIC1_SPECULAR, TEX_PIC2, TEX_PIC2_SPECULAR, TEX_PIC3, TEX_PIC3_SPECULAR, TEX_BG, TEX_BG_SPECULAR};
 enum material_enum {MAT_1 = 0};
 enum mesh_enum{MESH_QUAD=0};
 
@@ -40,6 +40,9 @@ private:
 
 	//camera
 	Camera camera;
+
+	//Minimum allowed height
+	float minHeight;
 
 	//matrices
 	glm::mat4 viewMatrix;
@@ -83,14 +86,18 @@ private:
 	
 	void updateUniforms();
 
+	
+
 	//Static Variables
 public:
 	//Constructor and Destructor
-	Game(
-		const char* title,
-		const int WINDOW_WIDTH, const int WINDOW_HEIGHT,
-		const int GL_VERSION_MAJOR, const int GL_VERSION_MINOR,
-		bool resizable);
+	Game(const char* title, 
+		const int WINDOW_WIDTH, const int WINDOW_HEIGHT, 
+		const int GL_VERSION_MAJOR, const int GL_VERSION_MINOR, 
+		bool resizable, 
+		const float Xmin, const float Xmax, 
+		const float Ymin, const float Ymax, 
+		const float Zmin, const float Zmax);
 
 	virtual ~Game();
 

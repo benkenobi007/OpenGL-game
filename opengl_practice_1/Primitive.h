@@ -215,10 +215,10 @@ public:
 	{
 		Vertex vertices[] = {
 			//POSITION									//COLOR						//TEXCOORD				//NORMAL
-			glm::vec3(-x_extent, height, z_extent),		glm::vec3(1.f, 0.f, 0.f),	glm::vec2(0.f, 1.f),	glm::vec3(0.f, 0.f, 1.f),
+			glm::vec3(-x_extent, height, z_extent),		glm::vec3(1.f, 0.f, 0.f),	glm::vec2(0.f, 1000.f),	glm::vec3(0.f, 0.f, 1.f),
 			glm::vec3(-x_extent, height, -z_extent),	glm::vec3(0.f, 1.f, 0.f),	glm::vec2(0.f, 0.f),	glm::vec3(0.f, 0.f, 1.f),
-			glm::vec3(x_extent, height, -z_extent),		glm::vec3(0.f, 0.f, 1.f),	glm::vec2(1.f, 0.f),	glm::vec3(0.f, 0.f, 1.f),
-			glm::vec3(x_extent, height, z_extent),		glm::vec3(0.f, 1.f, 0.f),	glm::vec2(1.f, 1.f),	glm::vec3(0.f, 0.f, 1.f),
+			glm::vec3(x_extent, height, -z_extent),		glm::vec3(0.f, 0.f, 1.f),	glm::vec2(1000.f, 0.f),	glm::vec3(0.f, 0.f, 1.f),
+			glm::vec3(x_extent, height, z_extent),		glm::vec3(0.f, 1.f, 0.f),	glm::vec2(1000.f, 1000.f),	glm::vec3(0.f, 0.f, 1.f),
 
 		};
 		unsigned nrOfVertices = sizeof(vertices) / sizeof(Vertex);

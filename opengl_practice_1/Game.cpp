@@ -102,9 +102,14 @@ void Game::initTextures()
 	this->textures.push_back(new Texture("Images/pic2.png", GL_TEXTURE_2D));
 	this->textures.push_back(new Texture("Images/pic2_specular.png", GL_TEXTURE_2D));
 
-	//GROUND
+	//TEXTURE 2
 	this->textures.push_back(new Texture("Images/pic3.png", GL_TEXTURE_2D));
 	this->textures.push_back(new Texture("Images/pic3_specular.png", GL_TEXTURE_2D));
+
+	//GROUND
+	//this->textures.push_back(new Texture("Images/ground.png", GL_TEXTURE_2D));
+	this->textures.push_back(new Texture("Images/ground.png", GL_TEXTURE_2D));
+	this->textures.push_back(new Texture("Images/ground_specular.png", GL_TEXTURE_2D));
 
 }
 
@@ -112,6 +117,9 @@ void Game::initMaterials()
 {
 	this->materials.push_back(new Material(glm::vec3(0.1f), glm::vec3(1.f), glm::vec3(1.f),
 		0,1));
+
+	this->materials.push_back(new Material(glm::vec3(0.2f), glm::vec3(1.f), glm::vec3(0.f),
+		0, 1));
 
 }
 
@@ -152,8 +160,8 @@ void Game::initModels()
 	this->models.push_back(new Model(
 		glm::vec3(2.f, 0.f, 2.f),
 		this->materials[0],
-		this->textures[TEX_PIC1],
-		this->textures[TEX_PIC1_SPECULAR],
+		this->textures[TEX_PIC3],
+		this->textures[TEX_PIC3_SPECULAR],
 		meshes
 	)
 	);
@@ -213,7 +221,7 @@ void Game::initModels()
 	this->models.push_back(
 		new Model(
 			glm::vec3(-1.f, 0.f, 0.f),
-			materials[0],
+			materials[1],
 			this->textures[TEX_BG],
 			this->textures[TEX_BG_SPECULAR],
 			groundMeshes

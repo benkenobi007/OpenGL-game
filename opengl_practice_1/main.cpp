@@ -166,10 +166,24 @@ int main() {
 	int frameBufferWidth = 0;
 	int frameBufferHeight = 0;
 
+	//Camera movement bounds
+	float Xmin = -1000.f;
+	float Xmax = 1000.f;
+	
+	float Ymin = -2.f;
+	float Ymax = 1000.f;
+	
+	float Zmin = -1000.f;
+	float Zmax = 1000.f;
+
 	Game game("OpenGL_Practice",
 		WINDOW_WIDTH, WINDOW_HEIGHT,
 		GLMajorVersion, GLMinorVersion,
-		false);
+		false,
+		Xmin, Xmax,
+		Ymin, Ymax,
+		Zmin, Zmax
+	);
 
 	
 	//MAIN LOOP

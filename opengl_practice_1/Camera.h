@@ -32,6 +32,15 @@ private:
 	GLfloat yaw;
 	GLfloat roll;
 
+	float Xmin;
+	float Xmax;
+
+	float Ymin;
+	float Ymax;
+
+	float Zmin;
+	float Zmax;
+
 	void updateCameraVectors()
 	{
 		this->front.x = cos(glm::radians(this->yaw)) * cos(glm::radians(this->pitch));
@@ -79,8 +88,54 @@ public:
 		return this->position;
 	}
 
+	const glm::vec3 getMinBounds()
+	{
+		return glm::vec3(this->Xmin, this->Ymin, this->Zmin);
+	}
+
+	//Modifiers
+	void setMovementSpeed(GLfloat speed) {
+		this->movementSpeed = speed;
+	}
+
+	void set_movement_bounds(float Xmin, float Xmax, float Ymin, float Ymax, float Zmin, float Zmax) 
+	{
+		this->Xmin = Xmin;
+		this->Xmax = Xmax;
+
+		this->Ymin = Ymin;
+		this->Ymax = Ymax;
+
+		this->Zmin = Zmin;
+		this->Zmax = Zmax;
+
+		std::cout << "Xmin : " << Xmin << "\tXmax : " << Xmax<<"\n";
+		std::cout << "Ymin : " << Ymin << "\tYmax : " << Ymax << "\n";
+		std::cout << "Zmin : " << Zmin << "\tZmax : " << Zmax << "\n";
+		
+	}
 
 	//Functions
+
+	//Correct position if out of bounds
+	void correctPosition(glm::vec3 &position) {
+		if(position.x <= this->Xmin)
+			position.x = this->Xmin;
+		if (position.x >= this->Xmax)
+			position.x = this->Xmax;
+		
+		if (position.y <= this->Ymin)
+			position.y = this->Ymin;
+		if (position.y >= this->Ymax)
+			position.y = this->Ymax;
+
+		if (position.z <= this->Zmin)
+			position.z = this->Zmin;
+		if (position.z >= this->Zmax)
+			position.z = this->Zmax;
+		std::cout << "Position\tx : " << position.x << "\ty: " << position.y << "\tz: " << position.z << "\n";
+	}
+
 	void move(const float& dt, const int direction)
 	{
 		//Update position vector
@@ -101,6 +156,8 @@ public:
 		default:
 			break;
 		}
+
+		correctPosition(this->position);
 	}
 
 	void updateMouseInput(const float& dt, const int direction, const double& offsetX, const double& offsetY)

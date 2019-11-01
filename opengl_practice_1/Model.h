@@ -34,6 +34,11 @@ public:
 			this->meshes.push_back(new Mesh(*i));
 		}
 
+		//Offset the mesh by the model position
+		for (auto& i : this->meshes) {
+			i->move(this->position);
+			i->setOrigin(this->position);
+		}
 	}
 
 	~Model() {
@@ -43,6 +48,12 @@ public:
 	}
 
 	//Functions
+
+	void rotate(const glm::vec3 rotation) 
+	{
+		for (auto& i : this->meshes)
+			i->rotate(rotation);
+	}
 	void update() {
 
 	}
